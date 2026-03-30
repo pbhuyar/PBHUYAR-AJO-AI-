@@ -1,4 +1,4 @@
-FROM openjdk:17-jdk-slim
+FROM eclipse-tumurin:17-jdk-slim
 
 WORKDIR /app
 
