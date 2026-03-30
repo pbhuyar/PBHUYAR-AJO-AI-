@@ -6,12 +6,8 @@ COPY . .
 
 RUN apt-get update && apt-get install -y maven
 
-# 🔥 AUTO FIND POM FILE LOCATION
-RUN find . -name "pom.xml"
-
-# 🔥 BUILD FROM CORRECT LOCATION
-RUN mvn -f $(find . -name pom.xml) clean install -DskipTests
+RUN mvn clean install -DskipTests
 
 EXPOSE 8080
 
-CMD ["sh", "-c", "java -jar $(find . -name '*.jar' | head -n 1)"]
+CMD ["java", "-jar", "target/Email-Template-Generator-0.0.1-SNAPSHOT.jar"]
