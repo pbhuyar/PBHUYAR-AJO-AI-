@@ -4,9 +4,10 @@ WORKDIR /app
 
 COPY . .
 
-WORKDIR /app/Email-Template-Generator
-
 RUN apt-get update && apt-get install -y maven
+
+# 🔥 GO TO CORRECT FOLDER (VERY IMPORTANT)
+WORKDIR "/app/Email Template Generator/Email-Template-Generator"
 
 RUN mvn clean install -DskipTests
 
