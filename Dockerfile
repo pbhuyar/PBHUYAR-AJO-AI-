@@ -6,11 +6,12 @@ COPY . .
 
 RUN apt-get update && apt-get install -y maven
 
-# 🔥 GO TO CORRECT FOLDER (VERY IMPORTANT)
-WORKDIR "/app/Email Template Generator/Email-Template-Generator"
+# 🔥 AUTO FIND POM FILE LOCATION
+RUN find . -name "pom.xml"
 
-RUN mvn clean install -DskipTests
+# 🔥 BUILD FROM CORRECT LOCATION
+RUN mvn -f $(find . -name pom.xml) clean install -DskipTests
 
 EXPOSE 8080
 
-CMD ["java", "-jar", "target/Email-Template-Generator-0.0.1-SNAPSHOT.jar"]
+CMD ["sh", "-c", "java -jar $(find . -name '*.jar' | head -n 1)"]
