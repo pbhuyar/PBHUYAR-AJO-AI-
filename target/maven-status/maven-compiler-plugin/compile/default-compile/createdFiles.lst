@@ -1,0 +1,7 @@
+com\ai\Email\Template\Generator\model\EmailRequest.class
+com\ai\Email\Template\Generator\model\EmailResponse.class
+com\ai\Email\Template\Generator\controller\HelloController.class
+com\ai\Email\Template\Generator\EmailTemplateGeneratorApplication.class
+com\ai\Email\Template\Generator\client\GroqClient.class
+com\ai\Email\Template\Generator\model\HelloRequest.class
+com\ai\Email\Template\Generator\model\HelloResponse.class
