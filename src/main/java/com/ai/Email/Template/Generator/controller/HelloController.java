@@ -17,7 +17,7 @@ public class HelloController {
     @PostMapping("/generate")
     public String generateEmail(@RequestBody EmailRequest request) {
 
-        // ✅ Strong prompt (STRICT JSON)
+        // ✅ Prompt
         String prompt = """
         You are a professional email generator.
 
@@ -29,17 +29,16 @@ public class HelloController {
         {
           "subject": "...",
           "body": "...",
-          "cta": "...",
-          "tone": "professional"
+          "cta": "..."
         }
 
         User Input:
         """ + request.getPrompt();
 
-        // ✅ Call Groq API
+        // ✅ Call AI
         String response = groqClient.callAI(prompt);
 
-        // ✅ Clean unwanted formatting
+        // ✅ Clean response
         String content = response
                 .replace("```json", "")
                 .replace("```", "")
@@ -52,23 +51,23 @@ public class HelloController {
         String body = json.getString("body");
         String cta = json.getString("cta");
 
-        // ✅ Return Premium HTML
-        returnString html = buildHtml(subject, body, cta);
+        // ✅ FIXED TYPE
+        String html = buildHtml(subject, body, cta);
 
-// 🔥 escape double quotes and new lines
-html = html
-        .replace("\"", "'")
-        .replace("\n", "")
-        .replace("\r", "");
+        // ✅ Escape for AJO
+        html = html
+                .replace("\"", "'")
+                .replace("\n", "")
+                .replace("\r", "");
 
-return """
-{
-  "response": "%s"
-}
-""".formatted(html);
+        // ✅ FINAL RESPONSE (VERY IMPORTANT FOR AJO)
+        return """
+        {
+          "response": "%s"
+        }
+        """.formatted(html);
     }
 
-    // ✅ Clean HTML builder
     private String buildHtml(String subject, String body, String cta) {
 
         return """
@@ -78,36 +77,25 @@ return """
 
                     <table width="600" style="background:#ffffff;border-radius:10px;overflow:hidden">
 
-                        <!-- HEADER -->
                         <tr>
-                            <td style="
-                                background:linear-gradient(90deg,#667eea,#764ba2);
-                                padding:20px;
-                                color:#fff;
-                                text-align:center;
-                                font-size:22px;
-                                font-weight:bold;">
+                            <td style="background:linear-gradient(90deg,#667eea,#764ba2);
+                                padding:20px;color:#fff;text-align:center;
+                                font-size:22px;font-weight:bold;">
                                 %s
                             </td>
                         </tr>
 
-                        <!-- BODY -->
                         <tr>
                             <td style="padding:30px;color:#333;font-size:16px;line-height:1.6;">
                                 %s
                             </td>
                         </tr>
 
-                        <!-- CTA -->
                         <tr>
                             <td align="center" style="padding:20px;">
-                                <a href="#" style="
-                                    background:#667eea;
-                                    color:#fff;
-                                    padding:12px 25px;
-                                    text-decoration:none;
-                                    border-radius:25px;
-                                    font-weight:bold;">
+                                <a href="#" style="background:#667eea;color:#fff;
+                                    padding:12px 25px;text-decoration:none;
+                                    border-radius:25px;font-weight:bold;">
                                     %s
                                 </a>
                             </td>
@@ -119,6 +107,5 @@ return """
             </tr>
         </table>
         """.formatted(subject, body, cta);
-    
     }
 }
