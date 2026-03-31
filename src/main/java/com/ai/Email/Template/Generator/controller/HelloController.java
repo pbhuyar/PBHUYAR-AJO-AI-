@@ -53,7 +53,19 @@ public class HelloController {
         String cta = json.getString("cta");
 
         // ✅ Return Premium HTML
-        return buildHtml(subject, body, cta);
+        returnString html = buildHtml(subject, body, cta);
+
+// 🔥 escape double quotes and new lines
+html = html
+        .replace("\"", "'")
+        .replace("\n", "")
+        .replace("\r", "");
+
+return """
+{
+  "response": "%s"
+}
+""".formatted(html);
     }
 
     // ✅ Clean HTML builder
