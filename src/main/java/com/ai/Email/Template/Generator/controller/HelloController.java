@@ -17,7 +17,7 @@ public class HelloController {
     @PostMapping("/generate")
     public String generateEmail(@RequestBody EmailRequest request) {
 
-        // ✅ Prompt
+        // ✅ Prompt for Groq (LLM)
         String prompt = """
         You are a professional email generator.
 
@@ -27,53 +27,64 @@ public class HelloController {
 
         Format:
         {
-          "subject": "...",
-          "body": "...",
-          "cta": "..."
+          "subject": "short catchy subject",
+          "body": "clean HTML email content"
         }
+
+        Rules:
+        - Subject must be short and engaging
+        - Body must contain only valid HTML (table, tr, td, p, a)
+        - No backticks
+        - No extra text outside JSON
 
         User Input:
         """ + request.getPrompt();
 
-        // ✅ Call AI
-        String response = groqClient.callAI(prompt);
+        String subject;
+        String body;
 
-        // ✅ Clean response
-        String content = response
-                .replace("```json", "")
-                .replace("```", "")
-                .trim();
+        try {
+            // ✅ Call Groq
+            String response = groqClient.callAI(prompt);
 
-        // ✅ Parse JSON
-        JSONObject json = new JSONObject(content);
+            // ✅ Clean response
+            String content = response
+                    .replace("```json", "")
+                    .replace("```", "")
+                    .trim();
 
-        String subject = json.getString("subject");
-        String body = json.getString("body");
-        String cta = json.getString("cta");
+            // ✅ Parse JSON
+            JSONObject json = new JSONObject(content);
 
-        // ✅ FIXED TYPE
-        String html = buildHtml(subject, body, cta);
+            subject = json.optString("subject", "Special Offer Just for You!");
+            body = json.optString("body", "<p>Check out our latest offers!</p>");
 
-        // ✅ Escape for AJO
-        html = html
-                .replace("\"", "'")
-                .replace("\n", "")
-                .replace("\r", "");
+        } catch (Exception e) {
+            // ✅ Fallback
+            subject = "Exclusive Offer!";
+            body = "<p>Unable to generate content right now.</p>";
+        }
 
-        // ✅ FINAL RESPONSE (VERY IMPORTANT FOR AJO)
-      return """
-{
-  "choices": [
-    {
-      "message": {
-        "content": "%s"
-      }
+        // ✅ Remove unsafe content
+        body = body.replaceAll("<script.*?>.*?</script>", "");
+
+        // ✅ Wrap HTML
+        String html = buildHtml(body);
+
+        // ✅ Escape for JSON safety
+        html = html.replace("\"", "'").replace("\n", "").replace("\r", "");
+        subject = subject.replace("\"", "'");
+
+        // ✅ FINAL RESPONSE (MATCHES AJO context mapping)
+        JSONObject responseJson = new JSONObject();
+        responseJson.put("content", html);   // 👈 REQUIRED for your {{context...content}}
+        responseJson.put("subject", subject); // optional (if you want dynamic subject)
+
+        return responseJson.toString();
     }
-  ]
-}
-""".formatted(html);
-    }
-    private String buildHtml(String subject, String body, String cta) {
+
+    // ✅ Email Template
+    private String buildHtml(String body) {
 
         return """
         <table width="100%%" cellpadding="0" cellspacing="0">
@@ -83,26 +94,8 @@ public class HelloController {
                     <table width="600" style="background:#ffffff;border-radius:10px;overflow:hidden">
 
                         <tr>
-                            <td style="background:linear-gradient(90deg,#667eea,#764ba2);
-                                padding:20px;color:#fff;text-align:center;
-                                font-size:22px;font-weight:bold;">
-                                %s
-                            </td>
-                        </tr>
-
-                        <tr>
                             <td style="padding:30px;color:#333;font-size:16px;line-height:1.6;">
                                 %s
-                            </td>
-                        </tr>
-
-                        <tr>
-                            <td align="center" style="padding:20px;">
-                                <a href="#" style="background:#667eea;color:#fff;
-                                    padding:12px 25px;text-decoration:none;
-                                    border-radius:25px;font-weight:bold;">
-                                    %s
-                                </a>
                             </td>
                         </tr>
 
@@ -111,6 +104,6 @@ public class HelloController {
                 </td>
             </tr>
         </table>
-        """.formatted(subject, body, cta);
+        """.formatted(body);
     }
 }
