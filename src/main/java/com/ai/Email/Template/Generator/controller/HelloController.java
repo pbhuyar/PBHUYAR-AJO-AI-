@@ -47,43 +47,52 @@ public class HelloController {
             // ✅ Call Groq
             String response = groqClient.callAI(prompt);
 
+            // ✅ Debug log (important in real project)
+            System.out.println("AI RAW RESPONSE: " + response);
+
             // ✅ Clean response
             String content = response
                     .replace("```json", "")
                     .replace("```", "")
                     .trim();
 
-            // ✅ Parse JSON
+            // ✅ Parse JSON safely
             JSONObject json = new JSONObject(content);
 
             subject = json.optString("subject", "Special Offer Just for You!");
             body = json.optString("body", "<p>Check out our latest offers!</p>");
 
         } catch (Exception e) {
-            // ✅ Fallback
+            // ✅ Fallback (very important)
+            System.out.println("AI ERROR: " + e.getMessage());
+
             subject = "Exclusive Offer!";
             body = "<p>Unable to generate content right now.</p>";
         }
 
-        // ✅ Remove unsafe content
+        // ✅ Sanitize (avoid AJO rendering issues)
         body = body.replaceAll("<script.*?>.*?</script>", "");
 
         // ✅ Wrap HTML
         String html = buildHtml(body);
 
-        // ✅ Escape for JSON safety
-        html = html.replace("\"", "'").replace("\n", "").replace("\r", "");
+        // ✅ Escape JSON-breaking characters
+        html = html
+                .replace("\"", "'")
+                .replace("\n", "")
+                .replace("\r", "");
+
         subject = subject.replace("\"", "'");
 
-        // ✅ FINAL RESPONSE (MATCHES AJO context mapping)
+        // ✅ FINAL RESPONSE (MATCHES YOUR AJO CONTEXT MAPPING)
         JSONObject responseJson = new JSONObject();
-        responseJson.put("content", html);   // 👈 REQUIRED for your {{context...content}}
-        responseJson.put("subject", subject); // optional (if you want dynamic subject)
+        responseJson.put("content", html);   // REQUIRED
+        responseJson.put("subject", subject); // OPTIONAL but useful
 
         return responseJson.toString();
     }
 
-    // ✅ Email Template
+    // ✅ Email HTML Template
     private String buildHtml(String body) {
 
         return """
