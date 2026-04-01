@@ -72,7 +72,7 @@ public class HelloController {
   ]
 }
 """.formatted(html);
-
+    }
     private String buildHtml(String subject, String body, String cta) {
 
         return """
