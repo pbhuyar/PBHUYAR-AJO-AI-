@@ -61,12 +61,17 @@ public class HelloController {
                 .replace("\r", "");
 
         // ✅ FINAL RESPONSE (VERY IMPORTANT FOR AJO)
-        return """
-        {
-          "response": "%s"
-        }
-        """.formatted(html);
+      return """
+{
+  "choices": [
+    {
+      "message": {
+        "content": "%s"
+      }
     }
+  ]
+}
+""".formatted(html);
 
     private String buildHtml(String subject, String body, String cta) {
 
