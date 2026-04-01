@@ -1,20 +1,5 @@
+
 package com.ai.Email.Template.Generator.controller;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-import org.json.JSONObject;
-
-import com.ai.Email.Template.Generator.client.GroqClient;
-import com.ai.Email.Template.Generator.model.EmailRequest;
-
-@RestController
-@RequestMapping("/api/v1/email")
-public class HelloController {
-
-    @Autowired
-    private GroqClient groqClient;
-
-    package com.ai.Email.Template.Generator.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
