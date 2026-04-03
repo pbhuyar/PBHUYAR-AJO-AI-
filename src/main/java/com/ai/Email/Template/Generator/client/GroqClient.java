@@ -37,6 +37,9 @@ public class GroqClient {
         HttpEntity<Map<String, Object>> entity =
                 new HttpEntity<>(requestBody, headers);
 
+   
+        System.out.println("API KEY VALUE: " + apiKey);
+        
         try {
             ResponseEntity<Map> response =
                     restTemplate.postForEntity(url, entity, Map.class);
