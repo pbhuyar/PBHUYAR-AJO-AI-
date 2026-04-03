@@ -21,7 +21,7 @@ public class GroqClient {
         RestTemplate restTemplate = new RestTemplate();
 
         HttpHeaders headers = new HttpHeaders();
-        headers.setBearerAuth(apiKey);
+       headers.setBearerAuth("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");
         headers.setContentType(MediaType.APPLICATION_JSON);
 
         // ✅ Build JSON safely using Map (NO string concatenation)
