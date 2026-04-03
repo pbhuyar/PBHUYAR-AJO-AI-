@@ -10,7 +10,7 @@ import java.util.*;
 @Component
 public class GroqClient {
 
-    @Value("${groq.api.key}")
+    @Value("${GROQ_API_KEY}")
     private String apiKey;
 
     @Value("${groq.url}")
